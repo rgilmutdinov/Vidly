@@ -1,0 +1,21 @@
+﻿@using Vidly.Models
+@model IEnumerable<Movie>
+@{
+	ViewBag.Title = "Movies";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Movies</h2>
+@if (!Model.Any())
+{
+	<text>We don't have any movies yet.</text>
+}
+else
+{
+	<ul>
+		@foreach (Movie movie in Model)
+		{
+			<p>@movie.Name</p>
+		}
+	</ul>
+}
