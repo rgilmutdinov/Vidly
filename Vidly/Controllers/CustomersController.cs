@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity.ModelConfiguration.Conventions;
+﻿using System.Data.Entity;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using Vidly.Models;
 
@@ -10,22 +7,32 @@ namespace Vidly.Controllers
 {
 	public class CustomersController : Controller
 	{
-		readonly List<Customer> _customers = new List<Customer>
+		private ApplicationDbContext _context;
+
+		public CustomersController()
 		{
-			new Customer { Id = 1, Name = "John Smith" },
-			new Customer { Id = 2, Name = "Marry Williams" }
-		};
+			_context = new ApplicationDbContext();
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			_context.Dispose();
+		}
 
 		[Route("customers")]
 		public ViewResult Index()
 		{
-			return View(this._customers);
+			var customers = _context.Customers
+				.Include(c => c.MembershipType)
+				.ToList();
+
+			return View(customers);
 		}
 
 		[Route("customers/{id}")]
 		public ActionResult Details(int id)
 		{
-			Customer customer = this._customers.FirstOrDefault(c => c.Id == id);
+			Customer customer = _context.Customers.SingleOrDefault(c => c.Id == id);
 			if (customer == null)
 			{
 				return HttpNotFound();
