@@ -26,12 +26,36 @@ namespace Vidly.Controllers
 			var membershipTypes = _context.MembershipTypes
 				.ToList();
 
-			NewCustomerViewModel vm = new NewCustomerViewModel
+			CustomerFormViewModel vm = new CustomerFormViewModel
 			{
+				Customer        = new Customer(),
 				MembershipTypes = membershipTypes
 			};
 
-			return View(vm);
+			return View("CustomerForm", vm);
+		}
+
+		[HttpPost]
+		[Route("customers/create")]
+		public ActionResult Save(Customer customer)
+		{
+			if (customer.Id == 0)
+			{
+				_context.Customers.Add(customer);
+			}
+			else
+			{
+				var dbCustomer = _context.Customers.Single(c => c.Id == customer.Id);
+
+				dbCustomer.Name = customer.Name;
+				dbCustomer.Birthdate = customer.Birthdate;
+				dbCustomer.MembershipTypeId = customer.MembershipTypeId;
+				dbCustomer.IsSubscribedToNewsletter = customer.IsSubscribedToNewsletter;
+			}
+
+			_context.SaveChanges();
+
+			return RedirectToAction("Index", "Customers");
 		}
 
 		[Route("customers")]
@@ -44,7 +68,7 @@ namespace Vidly.Controllers
 			return View(customers);
 		}
 
-		[Route("customers/{id}")]
+		[Route("customers/{id:int}")]
 		public ActionResult Details(int id)
 		{
 			Customer customer = _context.Customers
@@ -57,6 +81,26 @@ namespace Vidly.Controllers
 			}
 
 			return View(customer);
+		}
+
+		[Route("customers/edit/{id:int}")]
+		public ActionResult Edit(int id)
+		{
+			Customer customer = _context.Customers
+				.SingleOrDefault(c => c.Id == id);
+
+			if (customer == null)
+			{
+				return HttpNotFound();
+			}
+
+			var vm = new CustomerFormViewModel
+			{
+				Customer        = customer,
+				MembershipTypes = _context.MembershipTypes.ToList()
+			};
+
+			return View("CustomerForm", vm);
 		}
 	}
 }
