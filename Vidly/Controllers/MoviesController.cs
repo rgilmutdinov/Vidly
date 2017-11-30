@@ -48,6 +48,7 @@ namespace Vidly.Controllers
 		}
 
 		[Route("movies/edit/{id:int}")]
+		[Authorize(Roles = RoleName.CanManageMovies)]
 		public ActionResult Edit(int id)
 		{
 			Movie movie = _context.Movies
@@ -84,6 +85,7 @@ namespace Vidly.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[Route("movies/save")]
+		[Authorize(Roles = RoleName.CanManageMovies)]
 		public ActionResult Save(Movie movie)
 		{
 			if (!ModelState.IsValid)
