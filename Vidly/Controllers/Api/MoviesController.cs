@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web.Http;
@@ -19,10 +18,18 @@ namespace Vidly.Controllers.Api
 		}
 
 		// GET /api/movies
-		public IHttpActionResult GetMovies()
+		public IHttpActionResult GetMovies(string query = null)
 		{
-			IEnumerable<MovieDto> movies = _context.Movies
+			var moviesQuery = _context.Movies
 				.Include(m => m.Genre)
+				.Where(m => m.NumberAvailable > 0);
+
+			if (!string.IsNullOrWhiteSpace(query))
+			{
+				moviesQuery = moviesQuery.Where(m => m.Name.Contains(query));
+			}
+
+			var movies = moviesQuery
 				.ToList()
 				.Select(Mapper.Map<Movie, MovieDto>);
 
