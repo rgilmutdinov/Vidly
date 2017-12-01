@@ -15,6 +15,6 @@ namespace Vidly.Models
 
 		public DateTime DateRented { get; set; }
 
-		public DateTime DateReturned { get; set; }
+		public DateTime? DateReturned { get; set; }
 	}
 }
